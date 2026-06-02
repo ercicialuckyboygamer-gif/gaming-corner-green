@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaming Corner Green</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#08110a;color:#fff}
+header{padding:30px;text-align:center;background:linear-gradient(90deg,#0b5,#0a3)}
+h1{margin:0}
+.hero{padding:40px;text-align:center;background:
+radial-gradient(circle at 20% 20%,rgba(0,255,120,.2),transparent 20%),
+radial-gradient(circle at 80% 30%,rgba(0,255,120,.15),transparent 20%)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;padding:20px}
+.card{background:#102015;border-radius:14px;padding:16px;box-shadow:0 0 12px rgba(0,255,120,.15)}
+a.btn,button{display:inline-block;background:#0b5;color:white;text-decoration:none;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+.blackjack{padding:20px}
+#status{font-weight:bold;margin:10px 0}
+footer{text-align:center;padding:20px;color:#9fb}
+</style>
+</head>
+<body>
+<header>
+<h1>🎮 Gaming Corner Green</h1>
+<p>Discover games across the web + play Blackjack here!</p>
+</header>
+
+<section class="hero">
+<h2>Popular Game Sites</h2>
+<p>Hand-picked fun websites and browser games.</p>
+</section>
+
+<div class="grid">
+<div class="card"><h3>Neal.fun</h3><p>Interactive experiments and games.</p><a class="btn" target="_blank" href="https://neal.fun">Visit</a></div>
+<div class="card"><h3>Chess.com</h3><p>Play chess online.</p><a class="btn" target="_blank" href="https://www.chess.com">Visit</a></div>
+<div class="card"><h3>Tetris</h3><p>Classic block stacking.</p><a class="btn" target="_blank" href="https://tetris.com/play-tetris">Visit</a></div>
+<div class="card"><h3>2048</h3><p>Add numbers and reach 2048.</p><a class="btn" target="_blank" href="https://play2048.co">Visit</a></div>
+<div class="card"><h3>GeoGuessr</h3><p>Guess locations around the world.</p><a class="btn" target="_blank" href="https://www.geoguessr.com">Visit</a></div>
+<div class="card"><h3>Agar.io</h3><p>Grow your cell and survive.</p><a class="btn" target="_blank" href="https://agar.io">Visit</a></div>
+</div>
+
+<section class="blackjack">
+<h2>🃏 Mini Blackjack</h2>
+<p>Try your luck!</p>
+<div id="status"></div>
+<div>Player: <span id="player"></span></div>
+<div>Dealer: <span id="dealer"></span></div><br>
+<button onclick="startGame()">New Game</button>
+<button onclick="hit()">Hit</button>
+<button onclick="stand()">Stand</button>
+</section>
+
+<footer>Gaming Corner Green</footer>
+
+<script>
+let player=[], dealer=[], gameOver=true;
+
+function card(){ return Math.floor(Math.random()*10)+1; }
+function total(arr){ return arr.reduce((a,b)=>a+b,0); }
+
+function render(showDealer=false){
+ document.getElementById('player').textContent=player.join(', ')+' = '+total(player);
+ document.getElementById('dealer').textContent=showDealer ? dealer.join(', ')+' = '+total(dealer) : dealer[0]+', ?';
+}
+
+function startGame(){
+ player=[card(),card()];
+ dealer=[card(),card()];
+ gameOver=false;
+ document.getElementById('status').textContent='Your turn';
+ render();
+}
+
+function hit(){
+ if(gameOver) return;
+ player.push(card());
+ if(total(player)>21){
+   gameOver=true;
+   render(true);
+   document.getElementById('status').textContent='Bust! Dealer wins.';
+ } else render();
+}
+
+function stand(){
+ if(gameOver) return;
+ while(total(dealer)<17) dealer.push(card());
+ gameOver=true;
+ render(true);
+ const p=total(player), d=total(dealer);
+ let msg='';
+ if(d>21 || p>d) msg='You win!';
+ else if(p===d) msg='Push (tie).';
+ else msg='Dealer wins.';
+ document.getElementById('status').textContent=msg;
+}
+</script>
+</body>
+</html>
