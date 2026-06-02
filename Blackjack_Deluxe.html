@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gaming Corner Green - Blackjack Deluxe</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0b1210;color:white;text-align:center;padding:20px}
+.table{max-width:900px;margin:auto;background:#145a32;border-radius:20px;padding:20px}
+.cards{font-size:28px;margin:15px}
+button{padding:10px 16px;margin:5px;border:none;border-radius:8px;cursor:pointer}
+#msg{font-size:20px;font-weight:bold;margin:10px}
+</style>
+</head>
+<body>
+<div class="table">
+<h1>🃏 Blackjack Deluxe</h1>
+<p>Dealer stands on 17 • Aces count as 1 or 11 • Betting included</p>
+
+<div>Bank: $<span id="bank">1000</span></div>
+<div>
+Bet:
+<input id="bet" type="number" value="50" min="1" style="width:80px">
+</div>
+
+<h2>Dealer</h2>
+<div id="dealer" class="cards"></div>
+
+<h2>Player</h2>
+<div id="player" class="cards"></div>
+
+<div id="msg"></div>
+
+<button onclick="newGame()">New Hand</button>
+<button onclick="hit()">Hit</button>
+<button onclick="stand()">Stand</button>
+</div>
+
+<script>
+let deck=[],player=[],dealer=[],bank=1000,wager=50,active=false;
+
+function buildDeck(){
+  deck=[];
+  const vals=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+  for(let s=0;s<4;s++) for(let v of vals) deck.push(v);
+  deck.sort(()=>Math.random()-0.5);
+}
+
+function draw(){ return deck.pop(); }
+
+function score(hand){
+  let total=0, aces=0;
+  hand.forEach(c=>{
+    if(c==='A'){aces++; total+=11;}
+    else if(['J','Q','K'].includes(c)) total+=10;
+    else total+=Number(c);
+  });
+  while(total>21 && aces){ total-=10; aces--; }
+  return total;
+}
+
+function show(reveal=false){
+  document.getElementById('player').innerText =
+    player.join(' ') + '  ('+score(player)+')';
+
+  if(reveal){
+    document.getElementById('dealer').innerText =
+      dealer.join(' ') + '  ('+score(dealer)+')';
+  } else {
+    document.getElementById('dealer').innerText =
+      dealer[0] + ' ?';
+  }
+  document.getElementById('bank').innerText = bank;
+}
+
+function newGame(){
+  wager=Math.max(1,parseInt(document.getElementById('bet').value)||1);
+  if(wager>bank){ alert('Not enough money'); return; }
+
+  buildDeck();
+  player=[draw(),draw()];
+  dealer=[draw(),draw()];
+  active=true;
+  document.getElementById('msg').innerText='Your turn';
+  show(false);
+
+  if(score(player)===21) stand();
+}
+
+function hit(){
+  if(!active) return;
+  player.push(draw());
+  show(false);
+
+  if(score(player)>21){
+    bank-=wager;
+    active=false;
+    show(true);
+    document.getElementById('msg').innerText='Bust! You lose $'+wager;
+  }
+}
+
+function stand(){
+  if(!active) return;
+
+  while(score(dealer)<17) dealer.push(draw());
+
+  const p=score(player);
+  const d=score(dealer);
+
+  if(d>21 || p>d){
+    bank+=wager;
+    document.getElementById('msg').innerText='You win! +$'+wager;
+  } else if(p<d){
+    bank-=wager;
+    document.getElementById('msg').innerText='Dealer wins. -$'+wager;
+  } else {
+    document.getElementById('msg').innerText='Push (tie)';
+  }
+
+  active=false;
+  show(true);
+}
+</script>
+</body>
+</html>
